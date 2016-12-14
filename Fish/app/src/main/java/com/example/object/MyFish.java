@@ -23,7 +23,7 @@ public class MyFish extends GameObject implements IMyFish{
 	public MyFish(Resources resources) {
 		super(resources);
 		// TODO Auto-generated constructor stub
-		myfish = BitmapFactory.decodeResource(resources, R.drawable.myfish_left);
+		myfish = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(resources, R.drawable.myfish_left), 66, 33, true);
 		initBitmap();
 		this.score = 0;
 		this.speed = 20;

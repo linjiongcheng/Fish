@@ -21,10 +21,10 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg){
             if(msg.what == ConstantUtil.TO_MAIN_VIEW){
-                toMainView();
+                toMainView(msg.arg1);
             }
             else  if(msg.what == ConstantUtil.TO_END_VIEW){
-                toEndView(msg.arg1);
+                toEndView(msg.arg1,msg.obj.toString());
             }
             else  if(msg.what == ConstantUtil.END_GAME){
                 endGame();
@@ -42,18 +42,18 @@ public class MainActivity extends AppCompatActivity {
 
     }
     //显示游戏的主界面
-    public void toMainView(){
+    public void toMainView(int speed){
         if(mainView == null){
-            mainView = new MainView(this);
+            mainView = new MainView(this,speed);
         }
         setContentView(mainView);
         readyView = null;
         endView = null;
     }
     //显示游戏结束的界面
-    public void toEndView(int score){
+    public void toEndView(int score,String epilogue){
         if(endView == null){
-            endView = new EndView(this);
+            endView = new EndView(this,epilogue);
             endView.setScore(score);
         }
         setContentView(endView);

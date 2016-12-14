@@ -3,11 +3,15 @@ import com.example.constant.ConstantUtil;
 import com.example.Fish.MainActivity;
 import com.example.Fish.R;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Message;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 /*游戏结束时显示的界面*/
@@ -20,6 +24,7 @@ public class EndView extends BaseView{
 	private float strhei;
 	private boolean isBtChange;				// 按钮图片改变的标记
 	private boolean isBtChange2;
+	private String epilogue;
 	private String startGame = "重新挑战";	// 按钮的文字
 	private String exitGame = "退出游戏";
 	private Bitmap button;					// 按钮图片
@@ -27,10 +32,11 @@ public class EndView extends BaseView{
 	private Bitmap background;				// 背景图片
 	private Rect rect;						// 绘制文字的区域
 	private MainActivity mainActivity;
-	public EndView(Context context) {
+	public EndView(Context context,String epi) {
 		super(context);
 		// TODO Auto-generated constructor stub
 		this.mainActivity = (MainActivity)context;
+		epilogue = epi;
 		rect = new Rect();
 		thread = new Thread(this);
 	}
@@ -73,7 +79,19 @@ public class EndView extends BaseView{
 			{
 				isBtChange = true;
 				drawSelf();
-				mainActivity.getHandler().sendEmptyMessage(ConstantUtil.TO_MAIN_VIEW);
+				final String[] items = new String[]{"等级1","等级2","等级3","等级4","等级5"};
+				AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
+				builder.setTitle("请选择难度等级：");
+				builder.setItems(items, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						Message message = new Message();
+						message.what = ConstantUtil.TO_MAIN_VIEW;
+						message.arg1 = Integer.valueOf(which+1);
+						mainActivity.getHandler().sendMessage(message);
+					}
+				});
+				builder.create().show();
 			}
 			//判断第二个按钮是否被按下
 			else if(x > button_x && x < button_x + button.getWidth()
@@ -178,6 +196,11 @@ public class EndView extends BaseView{
 			paint.setTextSize(60);
 			float textlong = paint.measureText("总分:"+String.valueOf(score));
 			canvas.drawText("总分:"+String.valueOf(score), screen_width/2 - textlong/2, screen_height/2 - 100, paint);
+			Paint paint1 = new Paint();
+			paint1.setTextSize(120);
+			paint1.setColor(Color.RED);
+			float textlong1 = paint.measureText(epilogue);
+			canvas.drawText(epilogue, screen_width/2 - textlong1/2 - 40, screen_height/2 - 200, paint1);
 		} catch (Exception err) {
 			err.printStackTrace();
 		} finally {

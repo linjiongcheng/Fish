@@ -3,22 +3,33 @@ package com.example.view;
 import com.example.constant.ConstantUtil;
 import com.example.Fish.R;
 import com.example.factory.GameObjectFactory;
-import com.example.object.BigFish;
+import com.example.object.BigFish100000;
 import com.example.object.EnemyFish;
 import com.example.object.GameObject;
+import com.example.object.MiddleFish1000;
 import com.example.object.MiddleFish10000;
-import com.example.object.MiddleFish12000;
+import com.example.object.SmallFish1;
+import com.example.object.SmallFish10;
 import com.example.object.SmallFish100;
-import com.example.object.SmallFish1000;
-import com.example.object.SmallFish1200;
 
+import android.app.AlertDialog;
+import android.content.ContentProviderOperation;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.os.Message;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,35 +61,35 @@ public class ReadyView extends BaseView{
 		rect = new Rect();
 		factory = new GameObjectFactory();						  //工厂类
 		enemyFishs = new ArrayList<EnemyFish>();
+		for(int i = 0; i < SmallFish1.sumCount; i++){
+			//生产分值1的小型鱼
+			SmallFish1 smallFish1 = (SmallFish1) factory.createSmallFish1(getResources());
+			enemyFishs.add(smallFish1);
+		}
+		for(int i = 0; i < SmallFish10.sumCount; i++){
+			//生产分值10的小型鱼
+			SmallFish10 smallFish10 = (SmallFish10) factory.createSmallFish10(getResources());
+			enemyFishs.add(smallFish10);
+		}
 		for(int i = 0; i < SmallFish100.sumCount; i++){
 			//生产分值100的小型鱼
 			SmallFish100 smallFish100 = (SmallFish100) factory.createSmallFish100(getResources());
 			enemyFishs.add(smallFish100);
 		}
-		for(int i = 0; i < SmallFish1000.sumCount; i++){
-			//生产分值1000的小型鱼
-			SmallFish1000 smallFish1000 = (SmallFish1000) factory.createSmallFish1000(getResources());
-			enemyFishs.add(smallFish1000);
-		}
-		for(int i = 0; i < SmallFish1200.sumCount; i++){
-			//生产分值1200的小型鱼
-			SmallFish1200 smallFish1200 = (SmallFish1200) factory.createSmallFish1200(getResources());
-			enemyFishs.add(smallFish1200);
+		for(int i = 0; i < MiddleFish1000.sumCount; i++){
+			//生产分值1000的中型鱼
+			MiddleFish1000 middleFish1000 = (MiddleFish1000) factory.createMiddleFish1000(getResources());
+			enemyFishs.add(middleFish1000);
 		}
 		for(int i = 0; i < MiddleFish10000.sumCount; i++){
 			//生产分值10000的中型鱼
 			MiddleFish10000 middleFish10000 = (MiddleFish10000) factory.createMiddleFish10000(getResources());
 			enemyFishs.add(middleFish10000);
 		}
-		for(int i = 0; i < MiddleFish12000.sumCount; i++){
-			//生产分值12000的中型鱼
-			MiddleFish12000 middleFish12000 = (MiddleFish12000) factory.createMiddleFish12000(getResources());
-			enemyFishs.add(middleFish12000);
-		}
-		for(int i = 0; i < BigFish.sumCount; i++){
-			//生产大型鱼
-			BigFish bigPlane = (BigFish) factory.createBigFish(getResources());
-			enemyFishs.add(bigPlane);
+		for(int i = 0; i < BigFish100000.sumCount; i++){
+			//生产分值100000大型鱼
+			BigFish100000 bigFish100000 = (BigFish100000) factory.createBigFish100000(getResources());
+			enemyFishs.add(bigFish100000);
 		}
 		thread = new Thread(this);
 	}
@@ -124,7 +135,20 @@ public class ReadyView extends BaseView{
 					&& y > button_y && y < button_y + button.getHeight()) {
 				isBtChange = true;
 				drawSelf();
-				mainActivity.getHandler().sendEmptyMessage(ConstantUtil.TO_MAIN_VIEW);
+				final String[] items = new String[]{"等级1","等级2","等级3","等级4","等级5"};
+				AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
+				builder.setTitle("请选择难度等级：");
+				builder.setItems(items, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						Message message = new Message();
+						message.what = ConstantUtil.TO_MAIN_VIEW;
+						message.arg1 = Integer.valueOf(which+1);
+						mainActivity.getHandler().sendMessage(message);
+					}
+				});
+				builder.create().show();
+				//mainActivity.getHandler().sendEmptyMessage(ConstantUtil.TO_MAIN_VIEW);
 			}
 			//判断第二个按钮是否被按下
 			else if (x > button_x && x < button_x + button.getWidth()
@@ -203,6 +227,7 @@ public class ReadyView extends BaseView{
 			canvas.scale(scalex, scaley, 0, 0);					// 计算背景图片与屏幕的比例
 			canvas.drawBitmap(background, 0, 0, paint); 		// 绘制背景图
 			canvas.restore();
+			canvas.save();
 			canvas.drawBitmap(text, text_x, text_y, paint);		// 绘制文字图片
 			//当手指滑过按钮时变换图片
 			if (isBtChange) {
